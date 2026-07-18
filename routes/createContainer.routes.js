@@ -12,8 +12,8 @@ function pullDockerPromisified(image, tag) {
       if (err) return rej(err);
 
       docker.modem.followProgress(stream, (err, output) => {
-        if (err) reject(err);
-        else resolve(output);
+        if (err) rej(err);
+        else res(output);
       });
     });
   });
@@ -47,8 +47,14 @@ router.post("/create", async (req, res) => {
     },
   });
 
+  const network = docker.getNetwork('deploy-engine-network');
+
   await container.start();
   const inspect = await container.inspect();
+  await network.connect({
+    Container:inspect.Id,
+
+  })
 
   return res.json({
     status: "success",
