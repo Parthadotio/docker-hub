@@ -1,8 +1,9 @@
 import { Router } from "express";
 import Docker from "dockerode";
-import { log } from "node:console";
+import reverseproxy from "../reverse-proxy/reverse-proxy.js"
 
 const docker = new Docker();
+const network = docker.getNetwork('deploy-engine-network');
 
 const REVERSE_PROXY_HOST = process.env.REVERSE_PROXY_HOST ?? "localhost";
 
@@ -46,8 +47,6 @@ router.post("/create", async (req, res) => {
       AutoRemove: true,
     },
   });
-
-  const network = docker.getNetwork('deploy-engine-network');
 
   await container.start();
   const inspect = await container.inspect();
